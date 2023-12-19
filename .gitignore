@@ -21,6 +21,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 ios/.xcode.env.local
+ios/RNAnimation_1.xcworkspace/xcshareddata/
+ios/Podfile.lock
 
 # Android/IntelliJ
 #
@@ -39,6 +41,8 @@ local.properties
 node_modules/
 npm-debug.log
 yarn-error.log
+package-lock.json
+yarn.lock
 
 # fastlane
 #
@@ -64,3 +68,5 @@ yarn-error.log
 
 # testing
 /coverage
+
+

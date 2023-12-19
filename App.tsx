@@ -1,118 +1,229 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
+  Animated,
   Text,
-  useColorScheme,
   View,
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const windowHeight = Dimensions.get('window').height;
+const duration = 300;
+const duration2 = 2000;
+
+
+type LevelProps = PropsWithChildren<{
+  endValue: number,
+  total : number,
+  reached : number,
+  level : number,
+  levelText : string,
+  pause : number,
+}>
+
+
+export const LevelStatus = ({
+  endValue,
+  total,
+  reached,
+  level,
+  levelText,
+  pause,
+}: LevelProps) => {
+  const startValue = useRef(new Animated.Value(0)).current;
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const animation = useRef(new Animated.Value(0)).current;
+
+  const animationWidth = new Animated.Value(0);
+
+  const widthInterpolate = animationWidth.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', `${100 * (reached / total)}%`],
+  });
+
+  Animated.timing(animationWidth, {
+    toValue: 1,
+    duration: duration + duration2,
+    delay: duration * 11 + duration * level,
+    useNativeDriver: false,
+  }).start();
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(startValue, {
+        toValue: endValue,
+        duration: duration,
+        useNativeDriver: true,
+        delay: duration * level,
+      }),
+      Animated.timing(animation, {
+        toValue: 600 * (reached / total),
+        duration: duration2,
+        delay: duration * 11,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [
+    startValue,
+    endValue,
+    animation,
+    reached,
+    total,
+    pause,
+    level,
+    animationWidth,
+  ]);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 2500,
+      useNativeDriver: true,
+      delay: duration * level,
+    }).start();
+  }, [fadeAnim, level, pause]);
+
+
+  
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
+
+      <Animated.View
         style={[
-          styles.sectionTitle,
           {
-            color: isDarkMode ? Colors.white : Colors.black,
+            opacity: fadeAnim,
+            transform: [{translateY: startValue}],
+            marginVertical:5
           },
         ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+        <TouchableOpacity
+          onPress={() => {}}
+          style={{
+            backgroundColor: 'rgba(208, 208, 208, 0.8)',
+            height: windowHeight / 22,
+            width: 300,
+            borderRadius: 18,
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+          <View
+            style={{
+              zIndex: 20,
+              alignItems: 'center',
+              width: 300,
+            }}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                fontFamily: 'Poppins-Regular',
+                color: 'white',
+              }}>
+              {levelText}
+            </Text>
+          </View>
+          {level !== 0 ? (
+            <View
+              style={{
+                backgroundColor: '#fff',
+                height: windowHeight / 22 - 6,
+                width: windowHeight / 22 - 6,
+                margin: 3,
+                borderRadius: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'absolute',
+                zIndex: 20,
+              }}>
+              <Text
+                style={{
+                  color: 'grey',
+                  fontWeight: 'bold',
+                  fontFamily: 'Poppins-Regular',
+                }}>
+                {level}
+              </Text>
+            </View>
+          ) : null}
+
+          <Animated.View
+            style={
+              {
+                height: '100%',
+                width: widthInterpolate,
+                borderRadius: 160,
+                marginVertical: 40,
+                backgroundColor: reached == total ? 'red':'grey',
+                position: 'absolute',
+              }
+            }
+          />
+        </TouchableOpacity>
+      </Animated.View>
+
+  );
+};
+
+
+function App(): React.JSX.Element {
+
+  const Xpos = windowHeight / 4.5;
+  const gap = 10;
+
+  return (
+
+    <View style={{height: '100%',  alignItems: 'center'}}>
+            <LevelStatus
+              reached={243}
+              total={243}
+              endValue={Xpos - gap * 4}
+              level={4}
+              levelText={'HLD'}
+              pause={duration}
+            />
+            <LevelStatus
+              reached={7}
+              total={81}
+              
+              endValue={Xpos - gap * 3}
+              level={3}
+              levelText={'LLD'}
+              pause={duration}
+            />
+            <LevelStatus
+              reached={7}
+              total={27}
+              endValue={Xpos - gap * 2}
+              level={2}
+              levelText={'JAVA/PYTHON/JS'}
+              pause={duration}
+            />
+            <LevelStatus
+              reached={9}
+              total={9}
+              endValue={Xpos - gap * 1}
+              level={1}
+              levelText={'DSA'}
+              pause={duration}
+            />
+            <LevelStatus
+              reached={2}
+              total={3}
+              endValue={Xpos}
+              level={0}
+              levelText={
+                "Basics"
+              }
+              pause={duration}
+            />
+
     </View>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
