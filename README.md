@@ -2,6 +2,8 @@
 
 Horizontal Animated Progress Bar using width interpolation, with a hint of fading.
 
+[See in action](https://www.linkedin.com/posts/turjoy-saha_reactnative-reactnativedevelopment-animation-activity-7143569699392348160-wF56/)
+
 ## Step 0: Install libraries, dependencies etc.
 
 ```zsh
